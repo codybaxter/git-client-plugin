@@ -915,7 +915,7 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                     StandardCredentials cred = credentials.get(urIish.toPrivateString());
                     if (cred == null) cred = defaultCredentials;
 
-                    launchCommandWithCredentials(args, workspace, cred, null, timeout);
+                    launchCommandWithCredentials(args, workspace, cred, urIish, timeout);
                 }
             }
         };
