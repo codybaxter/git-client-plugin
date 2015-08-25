@@ -902,38 +902,20 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                         args.add("--reference", ref);
                 }
 
-                String cfgOutput = null;
-                try {
-                    // We might fail if we have no modules, so catch this
-                    // exception and just return.
-                    cfgOutput = launchCommand("config", "--get-regexp", "^submodule");
-                } catch (GitException e) {
-                    listener.error("No submodules found.");
-                    return;
-                }
-
-                // Use a matcher to find each configured submodule name, and
-                // then run the submodule update command with the provided
-                // path.
-                Pattern pattern = Pattern.compile("^submodule\\.(.*)\\.url", Pattern.MULTILINE);
-                Matcher matcher = pattern.matcher(cfgOutput);
-                while (matcher.find()) {
-                    ArgumentListBuilder perModuleArgs = args.clone();
-                    String sUrl = matcher.group(1);
-
+                for (Map.Entry<String, String> entry : submodBranch.entrySet()) {
                     URIish urIish = null;
+                    String subModuleName = entry.getKey();
                     try {
-                        urIish = new URIish(getSubmoduleUrl(sUrl));
+                        urIish = new URIish(getSubmoduleUrl(subModuleName));
                     } catch (URISyntaxException e) {
-                        listener.error("Invalid repository for " + sUrl);
-                        throw new GitException("Invalid repository for " + sUrl);
+                        listener.error("Invalid repository for " + subModuleName);
+                        throw new GitException("Invalid repository for " + subModuleName);
                     }
 
                     StandardCredentials cred = credentials.get(urIish.toPrivateString());
                     if (cred == null) cred = defaultCredentials;
 
-                    perModuleArgs.add(sUrl);
-                    launchCommandWithCredentials(perModuleArgs, workspace, cred, urIish, timeout);
+                    launchCommandWithCredentials(args, workspace, cred, urIish, timeout);
                 }
             }
         };
