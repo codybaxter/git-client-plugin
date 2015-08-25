@@ -885,14 +885,14 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                 if (recursive) {
                     args.add("--init", "--recursive");
                 }
-                if (remoteTracking && isAtLeastVersion(1,8,2,0)) {
+                /*if (remoteTracking && isAtLeastVersion(1,8,2,0)) {
                     args.add("--remote");
 
                     for (Map.Entry<String, String> entry : submodBranch.entrySet()) {
                         launchCommand("config", "-f", ".gitmodules", "submodule."+entry.getKey()+".branch", entry.getValue());
                     }
-                }
-                if ((ref != null) && !ref.isEmpty()) {
+                }*/
+                /*if ((ref != null) && !ref.isEmpty()) {
                     File referencePath = new File(ref);
                     if (!referencePath.exists())
                         listener.error("Reference path does not exist: " + ref);
@@ -900,7 +900,7 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                         listener.error("Reference path is not a directory: " + ref);
                     else
                         args.add("--reference", ref);
-                }
+                }*/
 
                 for (Map.Entry<String, String> entry : submodBranch.entrySet()) {
                     URIish urIish = null;
@@ -915,7 +915,7 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                     StandardCredentials cred = credentials.get(urIish.toPrivateString());
                     if (cred == null) cred = defaultCredentials;
 
-                    launchCommandWithCredentials(args, workspace, cred, urIish, timeout);
+                    launchCommandWithCredentials(args, workspace, cred, null, timeout);
                 }
             }
         };
