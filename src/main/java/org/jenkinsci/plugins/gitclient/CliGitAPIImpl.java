@@ -8,12 +8,11 @@ import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredenti
 
 import edu.umd.cs.findbugs.annotations.CheckForNull;
 import edu.umd.cs.findbugs.annotations.NonNull;
-import hudson.EnvVars;
-import hudson.FilePath;
-import hudson.Launcher;
+import hudson.*;
 import com.google.common.collect.Lists;
 import hudson.Launcher.LocalLauncher;
-import hudson.Util;
+import hudson.console.ConsoleAnnotator;
+import hudson.console.ConsoleNote;
 import hudson.model.TaskListener;
 import hudson.plugins.git.Branch;
 import hudson.plugins.git.GitException;
@@ -885,14 +884,14 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                 if (recursive) {
                     args.add("--init", "--recursive");
                 }
-                /*if (remoteTracking && isAtLeastVersion(1,8,2,0)) {
+                if (remoteTracking && isAtLeastVersion(1,8,2,0)) {
                     args.add("--remote");
 
                     for (Map.Entry<String, String> entry : submodBranch.entrySet()) {
                         launchCommand("config", "-f", ".gitmodules", "submodule."+entry.getKey()+".branch", entry.getValue());
                     }
-                }*/
-                /*if ((ref != null) && !ref.isEmpty()) {
+                }
+                if ((ref != null) && !ref.isEmpty()) {
                     File referencePath = new File(ref);
                     if (!referencePath.exists())
                         listener.error("Reference path does not exist: " + ref);
@@ -900,11 +899,11 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                         listener.error("Reference path is not a directory: " + ref);
                     else
                         args.add("--reference", ref);
-                }*/
+                }
 
                 for (Map.Entry<String, String> entry : submodBranch.entrySet()) {
-                    URIish urIish = null;
-                    String subModuleName = entry.getKey();
+                    URIish urIish;
+                    String subModuleName = entry.getValue();
                     try {
                         urIish = new URIish(getSubmoduleUrl(subModuleName));
                     } catch (URISyntaxException e) {
@@ -912,10 +911,11 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                         throw new GitException("Invalid repository for " + subModuleName);
                     }
 
-                    StandardCredentials cred = credentials.get(urIish.toPrivateString());
-                    if (cred == null) cred = defaultCredentials;
+                    /*StandardCredentials cred = credentials.get(urIish.toPrivateString());
+                    if (cred == null) cred = defaultCredentials;*/
+                    StandardCredentials cred = defaultCredentials;
 
-                    launchCommandWithCredentials(args, workspace, cred, urIish, timeout);
+                    launchCommandWithCredentials(args, workspace, cred, subModuleName);
                 }
             }
         };
