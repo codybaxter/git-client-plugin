@@ -884,11 +884,11 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                 if (recursive) {
                     args.add("--init", "--recursive");
                 }
-                if (remoteTracking && isAtLeastVersion(1,8,2,0)) {
+                if (remoteTracking && isAtLeastVersion(1, 8, 2, 0)) {
                     args.add("--remote");
 
                     for (Map.Entry<String, String> entry : submodBranch.entrySet()) {
-                        launchCommand("config", "-f", ".gitmodules", "submodule."+entry.getKey()+".branch", entry.getValue());
+                        launchCommand("config", "-f", ".gitmodules", "submodule." + entry.getKey() + ".branch", entry.getValue());
                     }
                 }
                 if ((ref != null) && !ref.isEmpty()) {
@@ -901,23 +901,36 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                         args.add("--reference", ref);
                 }
 
-                for (Map.Entry<String, String> entry : submodBranch.entrySet()) {
-                    URIish urIish;
-                    String subModuleName = entry.getValue();
-                    try {
-                        urIish = new URIish(getSubmoduleUrl(subModuleName));
-                    } catch (URISyntaxException e) {
-                        listener.error("Invalid repository for " + subModuleName);
-                        throw new GitException("Invalid repository for " + subModuleName);
+                List<IndexEntry> submodules;
+                try
+                {
+                    submodules = getSubmodules("HEAD");
+                }
+                catch (GitException e)
+                {
+                    launchCommand(args);
+                    return;
+                }
+
+                for (IndexEntry submodule : submodules)
+                {
+                    ArgumentListBuilder submoduleArgs = args.clone();
+                    String submoduleName = submodule.getFile();
+                    String submoduleUrl;
+                    try
+                    {
+                        submoduleUrl = getSubmoduleUrl(submoduleName);
                     }
-
-                    /*StandardCredentials cred = credentials.get(urIish.toPrivateString());
-                    if (cred == null) cred = defaultCredentials;*/
-                    StandardCredentials cred = defaultCredentials;
-
-                    listener.error("Submodule Update Args" + args);
-
-                    launchCommandWithCredentials(args, workspace, cred, subModuleName);
+                    catch (GitException e)
+                    {
+                        launchCommand(args);
+                        return;
+                    }
+                    submoduleArgs.add("--");
+                    submoduleArgs.add(submoduleName);
+                    StandardCredentials cred = credentials.get(submoduleUrl);
+                    if (cred == null) cred = defaultCredentials;
+                    launchCommandWithCredentials(submoduleArgs, workspace, cred, submoduleUrl);
                 }
             }
         };
