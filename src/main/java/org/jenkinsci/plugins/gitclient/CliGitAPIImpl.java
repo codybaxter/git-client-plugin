@@ -3,6 +3,7 @@ package org.jenkinsci.plugins.gitclient;
 
 import com.cloudbees.jenkins.plugins.sshcredentials.SSHUserPrivateKey;
 import com.cloudbees.plugins.credentials.common.StandardCredentials;
+import com.cloudbees.plugins.credentials.common.StandardUsernameCredentials;
 import com.cloudbees.plugins.credentials.common.UsernameCredentials;
 import com.cloudbees.plugins.credentials.common.StandardUsernamePasswordCredentials;
 
@@ -932,8 +933,36 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                     if (defaultCredentials != null) listener.error("defaultCredentials: " + defaultCredentials.toString());
                     if (credentials != null) listener.error("credentials: " + credentials.toString());
 
+                    if (cred == null)
+                    {
+                        cred = getCredentials(submoduleUrl);
+                    }
+
+                    listener.error("cred after searching: " + cred == null ? "not found" : cred.getDescription());
+
                     launchCommandWithCredentials(submoduleArgs, workspace, cred, submoduleUrl);
                 }
+            }
+
+            private StandardCredentials getCredentials(String url)
+            {
+                String shortenedUrl = shortUrl(url);
+                for (Map.Entry<String, StandardCredentials> cred : credentials.entrySet())
+                {
+                    if (shortUrl(cred.getKey()) == shortenedUrl)
+                    {
+                        return cred.getValue();
+                    }
+                }
+
+                return null;
+            }
+
+            private String shortUrl(String url)
+            {
+                int i = url.lastIndexOf('/');
+                i = i == -1 ? url.length() : i + 1;
+                return url.substring(0, i);
             }
         };
     }
