@@ -926,6 +926,9 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                     if (cred == null) cred = defaultCredentials;
 
                     listener.getLogger().print("launchCommandWithCredentials(" + submoduleArgs + ", workspace, " + cred.toString() + ", " + submoduleUrl);
+                    if (submoduleArgs != null) listener.getLogger().print("submoduleArgs: " + submoduleArgs);
+                    if (cred != null) listener.getLogger().print("cred: " + cred.toString());
+                    if (submoduleUrl != null) listener.getLogger().print("submoduleUrl: " + submoduleUrl);
 
                     launchCommandWithCredentials(submoduleArgs, workspace, cred, submoduleUrl);
                 }
