@@ -938,7 +938,7 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                         cred = getCredentials(submoduleUrl);
                     }
 
-                    listener.error("cred after searching: " + cred == null ? "not found" : cred.getDescription());
+                    listener.error("cred after searching: " + cred == null ? "not found" : cred.toString());
 
                     launchCommandWithCredentials(submoduleArgs, workspace, cred, submoduleUrl);
                 }
@@ -951,9 +951,13 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                 {
                     if (shortUrl(cred.getKey()) == shortenedUrl)
                     {
+                        listener.error("Found matching cred url: Search URL: " + shortenedUrl + " Found URL: " + shortUrl(cred.getKey()));
                         return cred.getValue();
                     }
                 }
+
+                listener.error("Did not find a match for search URL: " + shortenedUrl);
+                listener.error("In credentials: " + credentials == null ?  "null" : credentials.toString());
 
                 return null;
             }
