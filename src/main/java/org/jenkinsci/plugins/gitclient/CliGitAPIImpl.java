@@ -938,7 +938,7 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                         cred = getCredentials(submoduleUrl);
                     }
 
-                    listener.error("cred after searching: " + (cred == null ? "null" : cred.toString()));
+                    listener.error("cred after searching: " + (cred == null ? "null" : cred.getDescription()));
 
                     launchCommandWithCredentials(submoduleArgs, workspace, cred, submoduleUrl);
                 }
