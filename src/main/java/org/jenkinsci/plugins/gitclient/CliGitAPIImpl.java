@@ -938,8 +938,7 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                         cred = getCredentials(submoduleUrl);
                     }
 
-                    listener.error("cred after searching: ");
-                    listener.error(cred == null ? "null" : cred.toString());
+                    listener.error("cred after searching: " + (cred == null ? "null" : cred.toString()));
 
                     launchCommandWithCredentials(submoduleArgs, workspace, cred, submoduleUrl);
                 }
@@ -951,8 +950,8 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                 for (Map.Entry<String, StandardCredentials> cred : credentials.entrySet())
                 {
                     String testUrl = shortUrl(cred.getKey());
-                    listener.error("Testing url: " + testUrl == null ? "null" : testUrl + " for shortenedUrl: " + shortenedUrl);
-                    if (testUrl == shortenedUrl)
+                    listener.error("Testing url: " + (testUrl == null ? "null" : testUrl + " for shortenedUrl: " + shortenedUrl));
+                    if (shortenedUrl.contentEquals(testUrl))
                     {
                         listener.error("Found matching cred url: Search URL: " + shortenedUrl + " Found URL: " + shortUrl(cred.getKey()));
                         return cred.getValue();
@@ -960,7 +959,7 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                 }
 
                 listener.error("Did not find a match for search URL: " + shortenedUrl);
-                listener.error("In credentials: " + credentials == null ?  "null" : credentials.toString());
+                listener.error("In credentials: " + (credentials == null ?  "null" : credentials.toString()));
 
                 return null;
             }
