@@ -884,13 +884,6 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                 if (recursive) {
                     args.add("--init", "--recursive");
                 }
-                if (remoteTracking && isAtLeastVersion(1, 8, 2, 0)) {
-                    args.add("--remote");
-
-                    for (Map.Entry<String, String> entry : submodBranch.entrySet()) {
-                        launchCommand("config", "-f", ".gitmodules", "submodule." + entry.getKey() + ".branch", entry.getValue());
-                    }
-                }
                 if ((ref != null) && !ref.isEmpty()) {
                     File referencePath = new File(ref);
                     if (!referencePath.exists())
@@ -908,6 +901,7 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                 }
                 catch (GitException e)
                 {
+                    listener.error("getSubmodules(\"HEAD\" throw exception: " + e.getMessage());
                     launchCommand(args);
                     return;
                 }
@@ -930,6 +924,9 @@ public class CliGitAPIImpl extends LegacyCompatibleGitAPIImpl {
                     submoduleArgs.add(submoduleName);
                     StandardCredentials cred = credentials.get(submoduleUrl);
                     if (cred == null) cred = defaultCredentials;
+
+                    listener.getLogger().print("launchCommandWithCredentials(" + submoduleArgs + ", workspace, " + cred.toString() + ", " + submoduleUrl);
+
                     launchCommandWithCredentials(submoduleArgs, workspace, cred, submoduleUrl);
                 }
             }
